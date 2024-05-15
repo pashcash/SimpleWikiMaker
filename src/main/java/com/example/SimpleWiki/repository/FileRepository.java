@@ -8,7 +8,7 @@ public class FileRepository {
     private String folderPath;
     private List<File> allFiles;
     private List<File> currentFiles;
-    private HashMap<String, HashMap<String, String>> filesPropertys;
+    private HashMap<String, HashMap<String, String>> filesProperties;
 
     public FileRepository()
     {
@@ -111,15 +111,20 @@ public class FileRepository {
     }
 
     public void SetHtmlRepositoryByMd(FileRepository mdRepository) {
-        this.filesPropertys = new HashMap<String, HashMap<String,String>>();
+        this.filesProperties = new HashMap<String, HashMap<String,String>>();
+        System.out.println("Degub stage: Extracting properties");
         for (File fileMd: mdRepository.GetAllFiles()) 
         {
             if (fileMd.GetType().equals("file"))
             {
                 File htmlFile = new File(fileMd.GetName().split("\\.")[0] + ".html", fileMd.GetText(), fileMd.GetPath().split("\\.")[0] + ".html", "file");
-                HashMap<String,String> props = htmlFile.FindProperties();
-                if (props!=null)
-                    this.filesPropertys.put(htmlFile.GetPath(), props);
+                String frontmatter = "";
+                if (htmlFile.HasFrontmatter()) {
+                    frontmatter = htmlFile.ExtractFrontmatter();
+                    htmlFile.RemoveFrontmatter();
+                }
+                HashMap<String, String> props = htmlFile.ExtractProperties(frontmatter);
+                this.filesProperties.put(htmlFile.GetPath(), props);
                 this.AddFile(htmlFile);
             }
             else
@@ -131,7 +136,7 @@ public class FileRepository {
         {
             if (htmlFile.GetType().equals("file"))
             {
-                htmlFile.SetText(htmlFile.MdTextToHtml(this.filesPropertys));
+                htmlFile.SetText(htmlFile.MdTextToHtml(this.filesProperties));
             }
         }
         this.currentFolderPath = this.folderPath;

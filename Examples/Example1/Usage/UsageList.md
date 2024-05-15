@@ -1,1 +1,5 @@
 # UsageList
+
+```query
+[Kind:Usage]
+```
