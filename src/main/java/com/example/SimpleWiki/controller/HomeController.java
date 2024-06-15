@@ -19,10 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.HandlerMapping;
 
-
 import com.example.SimpleWiki.model.FileObject;
 import com.example.SimpleWiki.repository.FileRepository;
-import com.split.ftp.FtpOperation;
 
 import cn.hutool.core.io.FileUtil;
 import jakarta.servlet.http.HttpServletRequest;

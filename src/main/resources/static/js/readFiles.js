@@ -55,47 +55,43 @@ async function handleDirectoryEntry(filePath, dirHandle, out, fileList, settings
             if (file.name.split(".").pop() === "md") {
                 const fileContent = await file.text();
                 out[file.name] = {};
-                const fileStr = {};
-                fileStr["name"] = file.name;
-                fileStr["text"] = fileContent;
-                fileStr["type"] = "file";
-                fileStr["path"] = filePath + "/" + file.name;
+                const fileStr = fillFileString(fileContent, file.name, filePath, "file");
                 fileList.push(fileStr);
             }
             else if (file.name === "theme.css") {
                 const fileContent = await file.text();
-                const settingStr = {};
-                settingStr["name"] = file.name;
-                settingStr["text"] = fileContent;
-                settingStr["type"] = "theme";
+                const settingStr = fillFileString(fileContent, file.name, filePath, "theme");
                 settingsList.push(settingStr);
             }
             else if (file.name === "info.txt") {
                 const fileContent = await file.text();
-                const settingStr = {};
-                settingStr["name"] = file.name;
-                settingStr["text"] = fileContent;
-                settingStr["type"] = "settings";
+                const settingStr = fillFileString(fileContent, file.name, filePath, "settings");
                 settingsList.push(settingStr);
             }
         }
-        if (entry.kind === "directory") {
-            const newHandle = await dirHandle.getDirectoryHandle(entry.name, {
-                create: false,
-            });
+        else if (entry.kind === "directory") {
+            const newHandle = await dirHandle.getDirectoryHandle(entry.name, { create: false, });
             if (newHandle.name !== ".obsidian")
             {
                 const newOut = (out[entry.name]={});
-                const fileStr = {};
-                fileStr["name"] = newHandle.name;
-                fileStr["text"] = null;
-                fileStr["type"] = "dir";
-                fileStr["path"] = filePath + "/" + newHandle.name;
+                const fileStr = fillFileString(null, newHandle.name, filePath, "dir");
                 fileList.push(fileStr);
                 await handleDirectoryEntry(filePath + "/" + newHandle.name, newHandle, newOut, fileList, settingsList);
             }
         }
     }
+}
+
+function fillFileString(fileContent, fileName, filePath, fileType) {
+    const fileObject = {};
+    fileObject["name"] = fileName;
+    fileObject["text"] = fileContent;
+    fileObject["type"] = fileType;    
+    if (fileType === "file" || fileType === "dir")
+    {
+        fileObject["path"] = filePath + "/" + fileName;
+    }
+    return fileObject;
 }
 
 $('body').on('click', '#mdBackButton', function() {
